@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const DB_CONNECTION = process.env.DB_CONNECTION;
 const JWT_SECRET = process.env.JWT_SECRET;
 const EMAIL = process.env.EMAIL;
