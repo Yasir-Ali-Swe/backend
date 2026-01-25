@@ -1,37 +1,78 @@
 import { JWT_SECRET } from "../config/env.js";
 import jwt from "jsonwebtoken";
 import userModel from "../models/user.model.js";
-export const getUserFromToken = async (headers) => {
-  if (
-    !headers ||
-    !headers.authorization ||
-    !headers.authorization.startsWith("Bearer ")
-  ) {
+
+export const getUserFromToken = async (token, expectedPurpose = "auth") => {
+  if (!token) {
     const error = new Error("Unauthorized");
     error.status = 401;
     throw error;
   }
-  const token = headers.authorization.split(" ")[1];
+
   let decoded;
   try {
     decoded = jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    if (
-      error.name === "TokenExpiredError" ||
-      error.name === "JsonWebTokenError"
-    ) {
-      const err = new Error("Invalid or expired token");
-      err.status = 401;
-      throw err;
+  } catch (err) {
+    if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
+      const error = new Error("Invalid or expired token");
+      error.status = 401;
+      throw error;
     }
+    throw err;
+  }
+
+  if (decoded.purpose !== expectedPurpose) {
+    const error = new Error("Invalid token purpose");
+    error.status = 401;
     throw error;
   }
-  const userId = decoded.id;
-  const user = await userModel.findById(userId);
+
+  const user = await userModel.findById(decoded.id);
   if (!user) {
     const error = new Error("User not found");
     error.status = 404;
     throw error;
   }
+
+  // Check tokenVersion for auth tokens
+  if (expectedPurpose === "auth" && decoded.tokenVersion !== user.tokenVersion) {
+    const error = new Error("Token revoked");
+    error.status = 401;
+    throw error;
+  }
+
   return user;
 };
+
+
+
+// export const getUserFromToken = async (token, expectedPurpose = "auth") => {
+//   if (!token) {
+//     const error = new Error("Token is required");
+//     error.status = 401;
+//     throw error;
+//   }
+//   let decoded;
+//   try {
+//     decoded = jwt.verify(token, JWT_SECRET);
+//   } catch (error) {
+//     if (
+//       error.name === "TokenExpiredError" ||
+//       error.name === "JsonWebTokenError"
+//     ) {
+//       const err = new Error("Invalid or expired token");
+//       err.status = 401;
+//       throw err;
+//     }
+//     throw error;
+//   }
+//   const userId = decoded.id;
+//   const user = await userModel.findById(userId);
+//   if (!user) {
+//     const error = new Error("User not found");
+//     error.status = 404;
+//     throw error;
+//   }
+//   return user;
+// };
+
