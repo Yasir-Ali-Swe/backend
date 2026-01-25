@@ -19,11 +19,10 @@ export const register = async (req, res) => {
 
     if (userExist && !userExist.isVerified) {
       const userId = userExist._id;
-      const token = generateJwtToken(userId, 15 * 60); // 15 minutes
+      const token = generateJwtToken(userId, 15 * 60, "emailVerification"); // 15 minutes
       await sendVerificationEmail(email, token);
       return res.status(200).json({
-        message:
-          "You are already registerd so Verification email resent. Please verify your email.",
+        message: "User already registered. Verification email resent.",
       });
     }
     const hashedPassword = await hashPassword(password);
@@ -34,7 +33,7 @@ export const register = async (req, res) => {
     });
     const savedUser = await newUser.save();
     const userId = savedUser._id;
-    const token = generateJwtToken(userId, 15 * 60); // 15 minutes
+    const token = generateJwtToken(userId, 15 * 60, "emailVerification"); // 15 minutes
     await sendVerificationEmail(email, token);
     res.status(201).json({
       message: "User registered successfully. Please verify your email.",
@@ -48,7 +47,8 @@ export const register = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   try {
-    const user = await getUserFromToken(req.headers);
+    const { token } = req.params;
+    const user = await getUserFromToken(token, "emailVerification");
     if (user.isVerified) {
       return res.status(200).json({ message: "Email already verified" });
     }
@@ -56,15 +56,6 @@ export const verifyEmail = async (req, res) => {
     await user.save();
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
-    if (
-      error.name === "TokenExpiredError" ||
-      error.name === "JsonWebTokenError"
-    ) {
-      return res.status(401).json({
-        message: "Verification token has expired. Please register again.",
-      });
-    }
-
     console.log("Error in verifyEmail:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -92,10 +83,15 @@ export const login = async (req, res) => {
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const userId = userExist._id;
-    const token = generateJwtToken(userId, "1h");
 
-    res.cookie("token", token, {
+    const token = generateJwtToken(
+      userExist._id,
+      "7d",
+      "auth",
+      userExist.tokenVersion,
+    );
+
+    res.cookie("loginCookie", token, {
       httpOnly: true,
       secure: false,
       sameSite: "Strict",
@@ -111,18 +107,21 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const { email } = req.params;
-    const user = await getUserFromToken(req.headers);
+    const user = await getUserFromToken(req.cookies.loginCookie, "auth");
+
     if (user.email !== email) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: "invalid user" });
     }
-    console.log(email);
+
     user.tokenVersion++;
     await user.save();
-    res.clearCookie("token", {
+
+    res.clearCookie("loginCookie", {
       httpOnly: true,
       secure: false,
       sameSite: "Strict",
     });
+
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.log("Error in logout:", error.message);
