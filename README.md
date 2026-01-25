@@ -53,52 +53,53 @@
 
 Open your project in a code editor like VS Code, and it should look like this:
 
+```text
 project/
 ├── src/
 │   ├── configs/
 │   │   ├── database.js          # MongoDB connection configuration
-│   │   ├── socket.js           # Socket.io configuration
-│   │   └── multer.js           # File upload configuration
+│   │   ├── socket.js            # Socket.io configuration
+│   │   └── multer.js            # File upload configuration
 │   │
 │   ├── models/
-│   │   ├── User.js             # User entity model
-│   │   ├── Chat.js             # Chat entity model
-│   │   ├── Message.js          # Message entity model
-│   │   └── File.js             # File upload entity model
+│   │   ├── User.js              # User entity model
+│   │   ├── Chat.js              # Chat entity model
+│   │   ├── Message.js           # Message entity model
+│   │   └── File.js              # File upload entity model
 │   │
 │   ├── controllers/
-│   │   ├── authController.js   # Authentication logic
-│   │   ├── userController.js   # User management
-│   │   ├── chatController.js   # Chat operations
-│   │   └── fileController.js   # File upload handling
+│   │   ├── authController.js    # Authentication logic
+│   │   ├── userController.js    # User management
+│   │   ├── chatController.js    # Chat operations
+│   │   └── fileController.js    # File upload handling
 │   │
 │   ├── routes/
-│   │   ├── authRoutes.js       # Authentication endpoints
-│   │   ├── userRoutes.js       # User-related endpoints
-│   │   ├── chatRoutes.js       # Chat API endpoints
-│   │   └── fileRoutes.js       # File upload endpoints
+│   │   ├── authRoutes.js        # Authentication endpoints
+│   │   ├── userRoutes.js        # User-related endpoints
+│   │   ├── chatRoutes.js        # Chat API endpoints
+│   │   └── fileRoutes.js        # File upload endpoints
 │   │
 │   ├── middlewares/
-│   │   ├── authMiddleware.js   # Authentication verification
+│   │   ├── authMiddleware.js    # Authentication verification
 │   │   ├── validationMiddleware.js # Request validation
-│   │   └── uploadMiddleware.js # File upload validation
+│   │   └── uploadMiddleware.js  # File upload validation
 │   │
 │   ├── utils/
-│   │   ├── helpers.js          # General helper functions
-│   │   ├── validators.js       # Validation utilities
-│   │   ├── fileHandler.js      # File processing utilities
-│   │   └── socketEvents.js     # Socket event handlers
+│   │   ├── helpers.js           # General helper functions
+│   │   ├── validators.js        # Validation utilities
+│   │   ├── fileHandler.js       # File processing utilities
+│   │   └── socketEvents.js      # Socket event handlers
 │   │
 │   ├── sockets/
-│   │   └── chatSocket.js       # Real-time chat socket logic
+│   │   └── chatSocket.js        # Real-time chat socket logic
 │   │
-│   ├── uploads/                # Uploaded files storage
+│   ├── uploads/                 # Uploaded files storage
 │   │   ├── images/
 │   │   └── documents/
 │   │
-│   └── app.js                  # Express application setup
+│   └── app.js                   # Express application setup
 │
-├── .env.example               # Environment variables template
+├── .env.example                 # Environment variables template
 ├── .gitignore
 ├── package.json
 └── README.md
