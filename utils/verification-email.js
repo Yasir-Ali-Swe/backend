@@ -18,4 +18,5 @@ export const sendVerificationEmail = async (toEmail, token) => {
                <a href="http://localhost:3000/verify-email?token=${token}">Verify Email</a>`,
   };
   await transporter.sendMail(mailOptions);
+  console.log("Verification email sent to", toEmail);
 };
