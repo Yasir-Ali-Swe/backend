@@ -6,6 +6,8 @@ import { PORT } from "./config/env.js";
 import authRoutes from "./routes/auth.route.js";
 import clientRoutes from "./routes/client.route.js";
 import lawyerRoutes from "./routes/lawyer.route.js";
+import adminRoutes from "./routes/admin.route.js";
+
 const app = express();
 
 // Middleware
@@ -27,3 +29,4 @@ app.listen(PORT, async () => {
 app.use("/api/auth", authRoutes);
 app.use("/api/client", clientRoutes);
 app.use("/api/lawyer", lawyerRoutes);
+app.use("/api/admin", adminRoutes);
