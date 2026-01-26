@@ -16,10 +16,16 @@ const courtSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["Supreme", "High", "District", "Session"],
+      enum: ["Supreme Court", "High Court", "District Court", "Session Court"],
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   { timestamps: true },
 );
 
 const courtModel = mongoose.model("Court", courtSchema);
+export default courtModel;
