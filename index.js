@@ -1,16 +1,15 @@
 import express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { connectDB } from "./config/db.connection.js";
 import { PORT } from "./config/env.js";
-import authRoutes from "./routes/auth.route.js";
-import clientRoutes from "./routes/client.route.js";
-import lawyerRoutes from "./routes/lawyer.route.js";
-import adminRoutes from "./routes/admin.route.js";
+import { connectDB } from "./config/db-connection.js";
+import authRoutes from "./routes/auth-routes.js";
 
 const app = express();
+app.use(bodyParser.json());
+app.use(cookieParser());
 
-// Middleware
 app.use(
   cors({
     origin: "*",
@@ -18,15 +17,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
-app.use(cookieParser());
 
 app.listen(PORT, async () => {
-  await connectDB();
   console.log(`Server is running on port ${PORT}`);
+  await connectDB();
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/client", clientRoutes);
-app.use("/api/lawyer", lawyerRoutes);
-app.use("/api/admin", adminRoutes);
