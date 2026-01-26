@@ -26,6 +26,7 @@ export const registeration = async (req, res) => {
         "emailVerification",
         existingUser.tokenVersion,
       );
+      console.log("Varification token for resending email:", token);
       await sendVerificationEmail(email, token);
       return res.status(200).json({
         message: "Verification email resent. Please verify your email.",
@@ -46,6 +47,7 @@ export const registeration = async (req, res) => {
       "emailVerification",
       newUser.tokenVersion,
     );
+    console.log("Varification token for resending email:", token);
     await sendVerificationEmail(email, token);
     res.status(201).json({
       message: "Registration successful. Please verify your email.",
