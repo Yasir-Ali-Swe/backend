@@ -44,35 +44,3 @@ export const getUserFromToken = async (token, expectedPurpose = "auth") => {
   return user;
 };
 
-
-
-// export const getUserFromToken = async (token, expectedPurpose = "auth") => {
-//   if (!token) {
-//     const error = new Error("Token is required");
-//     error.status = 401;
-//     throw error;
-//   }
-//   let decoded;
-//   try {
-//     decoded = jwt.verify(token, JWT_SECRET);
-//   } catch (error) {
-//     if (
-//       error.name === "TokenExpiredError" ||
-//       error.name === "JsonWebTokenError"
-//     ) {
-//       const err = new Error("Invalid or expired token");
-//       err.status = 401;
-//       throw err;
-//     }
-//     throw error;
-//   }
-//   const userId = decoded.id;
-//   const user = await userModel.findById(userId);
-//   if (!user) {
-//     const error = new Error("User not found");
-//     error.status = 404;
-//     throw error;
-//   }
-//   return user;
-// };
-
