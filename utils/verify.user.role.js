@@ -5,7 +5,9 @@ import userModel from "../models/user.model.js";
 export const verifyUserRole = async (token, requiredRole) => {
   try {
     if (!token) {
-      const error = new Error("Unauthorized for this action or you are not logged in");
+      const error = new Error(
+        "Unauthorized for this action or you are not logged in",
+      );
       error.status = 401;
       throw error;
     }
@@ -14,6 +16,7 @@ export const verifyUserRole = async (token, requiredRole) => {
     decoded = jwt.verify(token, JWT_SECRET);
 
     const user = await userModel.findById(decoded.id);
+
     if (!user) {
       const error = new Error("User not found");
       error.status = 404;
@@ -25,6 +28,19 @@ export const verifyUserRole = async (token, requiredRole) => {
       error.status = 403;
       throw error;
     }
+
+    if (!user.isVerified) {
+      const error = new Error("Your account is not verified");
+      error.status = 403;
+      throw error;
+    }
+
+    if (!user.isProfileComplete) {
+      const error = new Error("Your profile is not complete");
+      error.status = 403;
+      throw error;
+    }
+
     return user;
   } catch (error) {
     if (
