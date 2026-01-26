@@ -1,7 +1,7 @@
 import profileModel from "../models/user.profile.model.js";
 import userModel from "../models/user.model.js";
 
-export const completeUserProfile = async (req, res) => {
+export const lawyerCompleteProfile = async (req, res) => {
   try {
     const { dob, city, province, profileImage } = req.body;
     const userId = req.userId;
@@ -34,7 +34,7 @@ export const completeUserProfile = async (req, res) => {
   }
 };
 
-export const getClientProfile = async (req, res) => {
+export const getLawyerProfile = async (req, res) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -54,7 +54,7 @@ export const getClientProfile = async (req, res) => {
   }
 };
 
-export const updateClientProfile = async (req, res) => {
+export const updateLawyerProfile = async (req, res) => {
   try {
     const userId = req.userId;
     const { dob, city, province, profileImage } = req.body;
