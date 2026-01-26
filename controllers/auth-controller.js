@@ -5,7 +5,7 @@ import { hashPassword, comparePassword } from "../utils/hash-password.js";
 
 export const registeration = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, role } = req.body;
     if (!fullName || !email || !password) {
       return res
         .status(400)
@@ -37,6 +37,7 @@ export const registeration = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
+      role,
     });
     await newUser.save();
     const token = generateJWT(
