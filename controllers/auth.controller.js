@@ -6,7 +6,7 @@ import { getUserFromToken } from "../utils/verify.jwt.token.js";
 
 export const register = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, role } = req.body;
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -30,6 +30,7 @@ export const register = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
+      role,
     });
     const savedUser = await newUser.save();
     const userId = savedUser._id;
