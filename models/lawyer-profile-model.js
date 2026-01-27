@@ -32,7 +32,7 @@ const lawyerProfileSchema = new mongoose.Schema(
 
     lawyerProfileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserProfile",
+      ref: "UserInfo",
       required: true,
     },
 
