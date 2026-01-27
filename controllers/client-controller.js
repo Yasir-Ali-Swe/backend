@@ -102,7 +102,6 @@ export const sendProposal = async (req, res) => {
       });
     }
 
-
     const existingPendingProposal = await proposalModel.findOne({
       clientId,
       lawyerId,
@@ -112,10 +111,10 @@ export const sendProposal = async (req, res) => {
     if (existingPendingProposal) {
       return res.status(400).json({
         success: false,
-        message: "You have already sent a proposal to this lawyer that is pending.",
+        message:
+          "You have already sent a proposal to this lawyer that is pending.",
       });
     }
-
 
     const newProposal = new proposalModel({
       title,
