@@ -16,7 +16,7 @@ const ClerkProfileSchema = new mongoose.Schema(
     },
     clerkProfileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserProfile",
+      ref: "UserInfo",
       required: true,
     },
     designation: { type: String, default: "Clerk" },
