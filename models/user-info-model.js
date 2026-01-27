@@ -29,6 +29,6 @@ const userProfileSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const UserProfileModel = mongoose.model("UserProfile", userProfileSchema);
+const UserProfileModel = mongoose.model("UserInfo", userProfileSchema);
 
 export default UserProfileModel;
