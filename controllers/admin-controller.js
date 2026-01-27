@@ -1,7 +1,7 @@
 import userInfo from "../models/user-info-model.js";
 import userBase from "../models/user-base-model.js";
 import courtModel from "../models/court-model.js";
-import clerkProfile from "../models/clerk-profile-model.js";
+import clerkProfileModel from "../models/clerk-profile-model.js";
 
 export const createProfile = async (req, res) => {
     try {
@@ -302,3 +302,56 @@ export const adminGetInternalUserById = async (req, res) => {
 }
 
 
+export const adminAssigneClerkToCourt = async (req, res) => {
+    try {
+        const { clerkId, courtId } = req.body;
+        const clerk = await userBase.findOne({ _id: clerkId, role: "clerk" });
+        const court = await courtModel.findOne({ _id: courtId });
+        if (!clerk) {
+            return res.status(404).json({ success: false, message: "Clerk  not found" });
+        }
+        if (!court) {
+            return res.status(404).json({ success: false, message: "Court not found" });
+        }
+
+        const clerkProfile = await clerkProfileModel.findOne({ userId: clerkId });
+        if (clerkProfile) {
+            return res.status(404).json({ success: false, message: "Clerk already assigned to court" });
+        }
+
+        const clerkInfoId = await userInfo.findOne({ userId: clerkId })
+        if (!clerkInfoId) {
+            return res.status(404).json({ success: false, message: "Clerk info not found" });
+        }
+
+        court.clerkId = clerkId;
+        await court.save();
+
+        const newClerkProfile = new clerkProfileModel({
+            userId: clerkId,
+            courtId: courtId,
+            clerkProfileId: clerkInfoId._id,
+            designation: "Clerk",
+        })
+        await newClerkProfile.save();
+        return res.status(200).json({ success: true, message: "Clerk assigned to court successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error assigning clerk to court", error: error })
+    }
+}
+
+export const getClerkProfile = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User id is required" })
+        }
+        const clerkProfile = await clerkProfileModel.findOne({ userId: userId }).populate("userId", "fullName email role").populate("courtId", "name type city province").populate("clerkProfileId", "dob city province");
+        if (!clerkProfile) {
+            return res.status(404).json({ success: false, message: "Clerk profile not found" })
+        }
+        return res.status(200).json({ success: true, message: "Clerk profile fetched successfully", clerkProfile })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error getting clerk profile", error: error })
+    }
+}   
