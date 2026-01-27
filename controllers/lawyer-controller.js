@@ -1,6 +1,7 @@
 import userBaseModel from "../models/user-base-model.js";
 import lawyerProfileModel from "../models/lawyer-profile-model.js";
 import UserInfoModel from "../models/user-info-model.js";
+import proposalModel from "../models/proposal-model.js";
 
 export const createLawyerInfo = async (req, res) => {
   try {
@@ -189,3 +190,95 @@ export const updateLawyerProfile = async (req, res) => {
       .json({ success: false, message: "Server Error", error: error.message });
   }
 };
+
+export const updateProposalStatus = async (req, res) => {
+  try {
+    const { proposalId, status } = req.body;
+    const lawyerId = req.userId.toString();
+
+    if (!proposalId || !status) {
+      return res.status(400).json({
+        success: false,
+        message: "Proposal ID and status are required",
+      });
+    }
+
+    if (!["accepted", "rejected"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'accepted' or 'rejected'",
+      });
+    }
+
+    const proposal = await proposalModel.findById(proposalId);
+
+    if (!proposal) {
+      return res.status(404).json({
+        success: false,
+        message: "Proposal not found",
+      });
+    }
+
+    if (proposal.lawyerId.toString() !== lawyerId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this proposal",
+      });
+    }
+
+    proposal.status = status;
+    const updatedProposal = await proposal.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Proposal ${status} successfully`
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: error.message });
+  }
+};
+
+
+export const getLawyerProposals = async (req, res) => {
+  try {
+    const lawyerId = req.userId;
+    const { status } = req.query;
+
+
+    if (!lawyerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Lawyer ID is required",
+      });
+    }
+    const query = { lawyerId };
+    if (status) {
+      query.status = status;
+    }
+
+    const proposals = await proposalModel
+      .find(query)
+      .populate("clientId", "fullName email")
+      .sort({ createdAt: -1 });
+
+    if (!proposals || proposals.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No proposals found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Proposals fetched successfully",
+      data: proposals,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: error.message });
+  }
+};
+
