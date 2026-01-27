@@ -1,4 +1,4 @@
-import { createProfile, adminUpdateHisProfile, adminGetHisProfile, adminCreateInternalUser, adminCreateCourt, getAllCourts, getCourtById, adminGetAllInternalUsers, adminGetInternalUserById, adminAssigneClerkToCourt, getClerkProfile } from "../controllers/admin-controller.js";
+import { createProfile, adminUpdateHisProfile, adminGetHisProfile, adminCreateInternalUser, adminCreateCourt, getAllCourts, getCourtById, adminGetAllInternalUsers, adminGetInternalUserById, adminAssigneClerkToCourt, getClerkProfile, adminAssigneCourtOfficerToCourt, getCourtOfficerProfile, adminGetAllCourtOfficers } from "../controllers/admin-controller.js";
 import { adminMiddleware } from "../middlewares/admin-middleware.js";
 import express from "express";
 
@@ -21,5 +21,7 @@ router.get("/get-internal-users", adminMiddleware, adminGetAllInternalUsers)
 router.get("/get-internal-user/:internalUserId", adminMiddleware, adminGetInternalUserById)
 router.post("/assign-clerk-to-court", adminMiddleware, adminAssigneClerkToCourt)
 router.get("/get-clerk-profile/:userId", adminMiddleware, getClerkProfile)
-
+router.post("/assigne-court-officer", adminMiddleware, adminAssigneCourtOfficerToCourt)
+router.get("/get-court-officer-profile/:userId", adminMiddleware, getCourtOfficerProfile)
+router.get("/get-all-court-officers", adminMiddleware, adminGetAllCourtOfficers)
 export default router;
