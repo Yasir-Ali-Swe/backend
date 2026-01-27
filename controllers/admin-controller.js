@@ -2,6 +2,7 @@ import userInfo from "../models/user-info-model.js";
 import userBase from "../models/user-base-model.js";
 import courtModel from "../models/court-model.js";
 import clerkProfileModel from "../models/clerk-profile-model.js";
+import courtOfficerProfileModel from "../models/court-officer-profile-model.js";
 
 export const createProfile = async (req, res) => {
     try {
@@ -354,4 +355,70 @@ export const getClerkProfile = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: "Error getting clerk profile", error: error })
     }
-}   
+}
+
+
+export const adminAssigneCourtOfficerToCourt = async (req, res) => {
+    try {
+        const { userId, courtId } = req.body;
+        if (!userId || !courtId) {
+            return res.status(400).json({ success: false, message: "User id and court id are required" })
+        }
+        const court = await courtModel.findById(courtId);
+        if (!court) {
+            return res.status(404).json({ success: false, message: "Court not found" })
+        }
+        const courtOfficerProfile = await courtOfficerProfileModel.findOne({ userId: userId });
+        if (courtOfficerProfile) {
+            return res.status(404).json({ success: false, message: "Court officer already assigned to court" });
+        }
+        const courtOfficerInfoId = await userInfo.findOne({ userId: userId })
+        if (!courtOfficerInfoId) {
+            return res.status(404).json({ success: false, message: "Court officer info not found" });
+        }
+        court.courtOfficerId = userId;
+        await court.save();
+        const newCourtOfficerProfile = new courtOfficerProfileModel({
+            userId: userId,
+            courtId: courtId,
+            courtOfficerProfileId: courtOfficerInfoId._id,
+            designation: "Court Officer",
+        })
+        await newCourtOfficerProfile.save();
+        return res.status(200).json({ success: true, message: "Court officer assigned to court successfully" });
+
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error assigning court officer to court", error: error })
+    }
+}
+
+
+export const getCourtOfficerProfile = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User id is required" })
+        }
+        const courtOfficerProfile = await courtOfficerProfileModel.findOne({ userId: userId }).populate("userId", "fullName email role").populate("courtId", "name type city province").populate("courtOfficerProfileId", "dob city province");
+        if (!courtOfficerProfile) {
+            return res.status(404).json({ success: false, message: "Court officer profile not found" })
+        }
+        return res.status(200).json({ success: true, message: "Court officer profile fetched successfully", courtOfficerProfile })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error getting court officer profile", error: error.message })
+    }
+}
+
+
+export const adminGetAllCourtOfficers = async (req, res) => {
+    try {
+        const courtOfficers = await courtOfficerProfileModel.find().populate("userId", "fullName email role").populate("courtId", "name type city province").populate("courtOfficerProfileId", "dob city province");
+        if (courtOfficers.length === 0) {
+            return res.status(404).json({ success: false, message: "Court officers not found" })
+        }
+        return res.status(200).json({ success: true, message: "Court officers fetched successfully", courtOfficers })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error getting court officers", error: error.message })
+    }
+}
