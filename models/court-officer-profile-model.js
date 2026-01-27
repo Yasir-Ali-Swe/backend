@@ -15,7 +15,7 @@ const CourtOfficerProfileSchema = new mongoose.Schema(
     },
     courtOfficerProfileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserProfile",
+      ref: "UserInfo",
       required: true,
     },
     designation: { type: String, default: "Court Officer" },
