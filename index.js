@@ -7,6 +7,7 @@ import { connectDB } from "./config/db-connection.js";
 import authRoutes from "./routes/auth-routes.js";
 import clientRoutes from "./routes/client-routes.js";
 import lawyerRoutes from "./routes/lawyer-routes.js";
+import adminRoutes from "./routes/admin-route.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,3 +29,5 @@ app.listen(PORT, async () => {
 app.use("/api/auth", authRoutes);
 app.use("/api/client", clientRoutes);
 app.use("/api/lawyer", lawyerRoutes);
+app.use("/api/admin", adminRoutes);
+
