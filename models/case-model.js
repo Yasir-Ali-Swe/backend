@@ -20,7 +20,7 @@ const CaseSchema = new mongoose.Schema(
       required: true,
     },
 
-    description: { type: String, default: null },
+    description: { type: String, default: null, required: true },
 
     courtId: {
       type: mongoose.Schema.Types.ObjectId,
