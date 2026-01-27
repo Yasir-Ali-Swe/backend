@@ -23,6 +23,7 @@ export const lawyerDraftCase = async (req, res) => {
 export const lawyerUpateTheDraftCase = async (req, res) => {
     try {
         const lawyerId = req.userId.toString();
+        const courtOfficerId = req.userId;
         if (!lawyerId) {
             return res.status(401).json({ success: false, message: "Unauthorized" })
         }
