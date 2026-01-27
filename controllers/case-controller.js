@@ -1,4 +1,6 @@
 import caseModel from "../models/case-model.js";
+import clerkProfileModel from "../models/clerk-profile-model.js";
+import courtOfficerProfileModel from "../models/court-officer-profile-model.js";
 
 export const lawyerDraftCase = async (req, res) => {
     try {
@@ -146,3 +148,81 @@ export const lawyerSubmitCase = async (req, res) => {
 
 
 
+export const clerkGetSubmitedCases = async (req, res) => {
+    try {
+        const clerkId = req.userId.toString();
+        if (!clerkId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+        const clerkProfile = await clerkProfileModel.findOne({ userId: clerkId })
+        if (!clerkProfile) {
+            return res.status(404).json({ success: false, message: "Clerk profile not found" })
+        }
+
+        const clerkCourtId = clerkProfile.courtId;
+        const submittedCases = await caseModel.find({ submissionStatus: "submitted", courtId: clerkCourtId })
+        return res.status(200).json({ success: true, message: "Submitted cases fetched successfully", data: submittedCases })
+
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error", error: error.message, success: false })
+    }
+}
+
+
+export const clerkRegisterCase = async (req, res) => {
+    try {
+        const clerkId = req.userId.toString();
+        const caseId = req.params.caseId;
+        const { courtOfficerId } = req.body;
+
+        if (!caseId || !courtOfficerId) {
+            return res
+                .status(400)
+                .json({ message: "Case ID and Court Officer ID are required." });
+        }
+
+        const clerkProfile = await clerkProfileModel.findOne({ userId: clerkId });
+        if (!clerkProfile) {
+            return res.status(404).json({ message: "Clerk profile not found." });
+        }
+
+        const existingCase = await caseModel.findById(caseId);
+
+        if (!existingCase || existingCase.submissionStatus !== "submitted") {
+            return res.status(404).json({ message: "Case not found." });
+        }
+
+        const courtOfficer = await courtOfficerProfileModel.findOne({
+            userId: courtOfficerId,
+            courtId: clerkProfile.courtId,
+        });
+
+        if (!courtOfficer) {
+            return res
+                .status(404)
+                .json({ message: "Court Officer not found in your court." });
+        }
+
+        if (
+            !existingCase.courtId ||
+            existingCase.courtId.toString() !== clerkProfile.courtId.toString()
+        ) {
+            return res.status(403).json({
+                message: "You are not authorized to register this case.",
+            });
+        }
+
+        existingCase.caseNumber = `CASE-${Date.now()}`;
+        existingCase.submissionStatus = "registered";
+        existingCase.status = "active";
+        existingCase.courtOfficerId = courtOfficerId;
+        existingCase.registeredByClerkAt = new Date();
+
+        await existingCase.save();
+        res
+            .status(200)
+            .json({ message: "Case registered successfully.", case: existingCase });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error: error.message, success: false });
+    }
+};
