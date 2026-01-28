@@ -10,6 +10,7 @@ import lawyerRoutes from "./routes/lawyer-routes.js";
 import adminRoutes from "./routes/admin-route.js";
 import caseRoutes from "./routes/case-route.js";
 import courtOfficerRoutes from "./routes/court-officer-route.js";
+import messagesRoutes from "./routes/message-route.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -34,4 +35,5 @@ app.use("/api/lawyer", lawyerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/case", caseRoutes);
 app.use("/api/court-officer", courtOfficerRoutes);
+app.use("/api/messages", messagesRoutes);
 
